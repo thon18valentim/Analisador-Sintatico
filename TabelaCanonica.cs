@@ -1,4 +1,6 @@
 ﻿
+using Spectre.Console;
+
 namespace AnalisadorSintatico
 {
   internal class TabelaCanonica
@@ -21,9 +23,11 @@ namespace AnalisadorSintatico
 
       SetarNumeroDeReducoes(items);
 
-      Console.WriteLine("\n\n| --------------------------- |");
-      Console.WriteLine("| -------Tabela Canônica----- |");
-      Console.WriteLine($"\n{string.Join(" ", Acoes)} | {string.Join(" ", GoTo)}");
+      var tabelaView = new Table();
+      Acoes.ForEach(ac => tabelaView.AddColumn(new TableColumn(ac).Centered()));
+      GoTo.ForEach(gt => tabelaView.AddColumn(new TableColumn(gt).Centered()));
+
+      AnsiConsole.Write(new Markup("\n[bold green]Tabela Canônica[/]\n"));
       for (int i = 0; i < items.Count; i++)
       {
         var item = items.FirstOrDefault(it => it.Index == i) ?? throw new Exception("Erro, item não encontrado na criação da tabela");
@@ -65,7 +69,9 @@ namespace AnalisadorSintatico
         }
       }
 
-      MostrarTabela(tabela);
+      //MostrarTabela(tabela);
+      MontarTabela(tabela, tabelaView);
+      AnsiConsole.Write(tabelaView);
     }
 
     private static void SetarNumeroDeReducoes(List<Item> items)
@@ -91,6 +97,25 @@ namespace AnalisadorSintatico
           Console.Write($"{tabela[i, j]} ");
         }
         Console.Write("\n");
+      }
+    }
+
+    private static void MontarTabela(string[,] tabela, Table tabelaView)
+    {
+      CorrigindoEspacoEmBranco(tabela);
+
+      for (int i = 0; i < tabela.GetLength(0); i++)
+      {
+        var texts = new string[tabela.GetLength(1)];
+        for (int j = 0; j < tabela.GetLength(1); j++)
+        {
+          if (tabela[i, j] == null)
+            texts[j] = " ";
+          else
+            texts[j] = tabela[i, j];
+        }
+
+        tabelaView.AddRow(texts);
       }
     }
 
