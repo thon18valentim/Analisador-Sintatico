@@ -1,6 +1,4 @@
 ﻿
-using System.Net.Http.Headers;
-
 namespace AnalisadorSintatico
 {
   internal class Gramatica
@@ -23,5 +21,22 @@ namespace AnalisadorSintatico
 
     public List<Letra> PegarLetrasNaoFinais()
       => Letras.FindAll(lt => !lt.EFinal && !lt.GeraEstadoAceitacao);
+
+    public override string ToString()
+    {
+      var text = string.Empty;
+      foreach (var letra in Letras)
+      {
+        foreach (var galho in letra.Galhos)
+        {
+          if (letra.GeraEstadoAceitacao)
+            text += $"{letra} -> {galho}\n";
+          else
+            text += $"{letra} -> {galho} ({galho.NumeroReducao})\n";
+        }
+      }
+
+      return text;
+    }
   }
 }

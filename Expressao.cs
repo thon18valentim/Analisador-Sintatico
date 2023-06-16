@@ -87,5 +87,10 @@ namespace AnalisadorSintatico
 
       return $"{LetraGeradora} -> {letrasGeradas}";
     }
+
+    public string ToStringSomenteLetrasGeradas()
+    {
+      return string.Join("", LetrasGeradas);
+    }
   }
 }

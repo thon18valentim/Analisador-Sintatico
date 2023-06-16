@@ -7,9 +7,9 @@ var a = new Letra(3, "A", false, false);
 var azinho = new Letra(5, "a", true, false);
 var bzinho = new Letra(6, "b", true, false);
 
-slinha.CriarGalhos(new() { new Galho(new() { s }) });
-s.CriarGalhos(new() { new Galho(new() { a, a }) });
-a.CriarGalhos(new() { new Galho(new() { azinho, a }), new Galho(new() { bzinho }) });
+slinha.CriarGalhos(new() { new Galho(new() { s }, 0) });
+s.CriarGalhos(new() { new Galho(new() { a, a }, 1) });
+a.CriarGalhos(new() { new Galho(new() { azinho, a }, 2), new Galho(new() { bzinho }, 3) });
 
 var gramatica = new Gramatica(new() { slinha, s, a, azinho, bzinho });
 
@@ -48,5 +48,19 @@ var goTo = new List<string>();
 gramatica.PegarLetrasFinais().ForEach(lt => acoes.Add(lt.Nome));
 gramatica.PegarLetrasNaoFinais().ForEach(lt => goTo.Add(lt.Nome));
 
+Console.WriteLine("\n\n");
+Console.WriteLine("--- Gramática ---");
+Console.WriteLine(gramatica);
+
 var tabelaCanonica = new TabelaCanonica(acoes, goTo);
-tabelaCanonica.CriarTabela(listaDeItems);
+tabelaCanonica.CriarTabela(listaDeItems, gramatica);
+
+var palavra = "aabb";
+Compilador compilador = new(tabelaCanonica.PegarCabecalho(), tabelaCanonica.PegarTabela(), listaDeItems, gramatica);
+compilador.SetarPalavra(palavra);
+var resultado = compilador.Executar();
+
+if (resultado)
+  Console.WriteLine($"Palavra {palavra} ACEITA!");
+else
+  Console.WriteLine($"Palavra {palavra} RECUSADA!");

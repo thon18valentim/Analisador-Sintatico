@@ -7,6 +7,8 @@ namespace AnalisadorSintatico
   {
     public List<string> Acoes { get; private set; }
     public List<string> GoTo { get; private set; }
+    private string[] Cabecalho { get; set; }
+    private string[,] Tabela { get; set; }
 
     public TabelaCanonica(List<string> acoes, List<string> goTo)
     {
@@ -16,14 +18,18 @@ namespace AnalisadorSintatico
       Acoes.Add("$");
     }
 
-    public void CriarTabela(List<Item> items)
+    public void CriarTabela(List<Item> items, Gramatica gramatica)
     {
       var opcs = Acoes.Concat(GoTo).ToList();
-      var tabela = new string[items.Count, opcs.Count];
 
-      SetarNumeroDeReducoes(items);
+      Cabecalho = new string[opcs.Count];
+      Tabela = new string[items.Count, opcs.Count + 1];
+
+      CriarCabecalho(opcs);
+      SetarNumeroDeReducoes(items, gramatica);
 
       var tabelaView = new Table();
+      tabelaView.AddColumn(new TableColumn("Item").Centered());
       Acoes.ForEach(ac => tabelaView.AddColumn(new TableColumn(ac).Centered()));
       GoTo.ForEach(gt => tabelaView.AddColumn(new TableColumn(gt).Centered()));
 
@@ -31,17 +37,19 @@ namespace AnalisadorSintatico
       for (int i = 0; i < items.Count; i++)
       {
         var item = items.FirstOrDefault(it => it.Index == i) ?? throw new Exception("Erro, item não encontrado na criação da tabela");
-        
+        Tabela[i, 0] = i.ToString();
+
         if (item.Aceitacao)
         {
-          tabela[i, Acoes.Count - 1] = "X";
+          //tabelaTEMP[i, Acoes.Count - 1] = "X";
+          Tabela[i, Acoes.Count] = "X";
           continue;
         }
         else if (item.Reducao)
         {
           for (int j = 0; j < Acoes.Count; j++)
           {
-            tabela[i, j] = $"r{item.NumeroReducao}";
+            Tabela[i, j + 1] = $"r{item.NumeroReducao}";
           }
           continue;
         }
@@ -58,77 +66,94 @@ namespace AnalisadorSintatico
             {
               if (acao.EFinal)
               {
-                tabela[i, j] = $"S{acao.GoTo}";
+                Tabela[i, j + 1] = $"S{acao.GoTo}";
               }
               else
               {
-                tabela[i, j] = $"{acao.GoTo}";
+                Tabela[i, j + 1] = $"{acao.GoTo}";
               }
             }
           }
         }
       }
 
-      //MostrarTabela(tabela);
-      MontarTabela(tabela, tabelaView);
-      AnsiConsole.Write(tabelaView);
+      MostrarTabela(tabelaView);
     }
 
-    private static void SetarNumeroDeReducoes(List<Item> items)
+    private void CriarCabecalho(List<string> opcs)
     {
-      int contador = 1;
-      var listaFiltrada = items.FindAll(it => it.Reducao);
-      listaFiltrada.ForEach(it =>
+      int index = 0;
+      opcs.ForEach(op =>
       {
-        it.NumeroReducao = contador;
-        contador += 1;
+        Cabecalho[index] = op;
+        index++;
       });
     }
 
-    private static void MostrarTabela(string[,] tabela)
+    private static void SetarNumeroDeReducoes(List<Item> items, Gramatica gramatica)
     {
-      CorrigindoEspacoEmBranco(tabela);
-
-      Console.WriteLine("\n\n-- Demonstrando Tabela --");
-      for (int i = 0; i < tabela.GetLength(0); i++)
+      var listaFiltrada = items.FindAll(it => it.Reducao);
+      listaFiltrada.ForEach(it =>
       {
-        for (int j = 0; j < tabela.GetLength(1); j++)
+        //if (it.Expressoes.Any(ex => string.Equals(ex.ToStringSemPonto(), gramatica.Letras)))
+        //int contador = 0;
+        foreach (var lt in gramatica.Letras)
         {
-          Console.Write($"{tabela[i, j]} ");
+          foreach (var g in lt.Galhos)
+          {
+            if (it.Expressoes.Any(ex => Equals(ex.ToStringSomenteLetrasGeradas(), g.ToString())))
+            {
+              it.NumeroReducao = g.NumeroReducao;
+            }
+          }
         }
-        Console.Write("\n");
-      }
+
+        //it.NumeroReducao = contador;
+        //contador += 1;
+      });
     }
 
-    private static void MontarTabela(string[,] tabela, Table tabelaView)
+    private void MostrarTabela(Table tabelaView)
     {
-      CorrigindoEspacoEmBranco(tabela);
+      CorrigindoNulos();
 
-      for (int i = 0; i < tabela.GetLength(0); i++)
+      for (int i = 0; i < Tabela.GetLength(0); i++)
       {
-        var texts = new string[tabela.GetLength(1)];
-        for (int j = 0; j < tabela.GetLength(1); j++)
+        var texts = new string[Tabela.GetLength(1)];
+        for (int j = 0; j < Tabela.GetLength(1); j++)
         {
-          if (tabela[i, j] == null)
-            texts[j] = " ";
-          else
-            texts[j] = tabela[i, j];
+            texts[j] = Tabela[i, j];
         }
 
         tabelaView.AddRow(texts);
       }
+
+      AnsiConsole.Write(tabelaView);
     }
 
-    private static void CorrigindoEspacoEmBranco(string[,] tabela)
+    private void CorrigindoNulos()
     {
-      for (int i = 0; i < tabela.GetLength(0); i++)
+      for (int i = 0; i < Tabela.GetLength(0); i++)
       {
-        for (int j = 0; j < tabela.GetLength(1); j++)
+        for (int j = 0; j < Tabela.GetLength(1); j++)
         {
-          if (tabela[i, j] == "")
-            tabela[i, j] = " ";
+          if (Tabela[i, j] == null)
+            Tabela[i, j] = " ";
         }
       }
+    }
+
+    public string[,] PegarTabela()
+    {
+      if (Tabela == null)
+        throw new Exception("Erro, a tabela deve ser CRIADA antes de ser acessada.");
+
+      return Tabela;
+    }
+
+    public string[] PegarCabecalho()
+    {
+      return Cabecalho;
     }
   }
 }
