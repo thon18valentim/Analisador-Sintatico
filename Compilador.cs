@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics;
 using System.Linq;
 
 namespace AnalisadorSintatico
@@ -69,7 +70,7 @@ namespace AnalisadorSintatico
       }
       else
       {
-        sucesso = BuscarAcaoNaTabela(PegarEstadoMaisProximo(), Palavra[0]);
+        sucesso = BuscarAcaoNaTabela(PegarEstadoMaisProximo(), Palavra[Ponteiro]);
       }
 
       if (!sucesso)
@@ -98,7 +99,10 @@ namespace AnalisadorSintatico
 
       var acao = TabelaCanonica[estadoAtual, indexLetra + 1];
       if (acao == " ")
+      {
+        Console.WriteLine($"\nEstado {estadoAtual} | indexLetra: {indexLetra}");
         return false;
+      }
 
       if (acao == "X")
       {
@@ -109,7 +113,8 @@ namespace AnalisadorSintatico
       // verificando se é redução
       if (acao[0] == 'r')
       {
-        AplicarReducao(letra.ToString());
+        //AplicarReducao(letra.ToString());
+        AplicarReducaoTESTE(int.Parse(acao[1].ToString()));
         acaoNaPilha = 0;
       }
       else if (acao[0] == 'S')
@@ -186,6 +191,23 @@ namespace AnalisadorSintatico
       });
 
       PilhaDeAnaliseSintatica.Push(letraGeradora);
+    }
+
+    private void AplicarReducaoTESTE(int numeroReducao)
+    {
+      var estado = Estados.FirstOrDefault(es => es.NumeroReducao == numeroReducao);
+
+      if (estado == null)
+        throw new Exception($"Erro, não existem nenhum estado com redução r{numeroReducao}");
+
+      var expressao = estado?.Expressoes[0];
+      expressao.LetrasGeradas.ForEach(lt =>
+      {
+        PilhaDeAnaliseSintatica.Pop();
+        PilhaDeAnaliseSintatica.Pop();
+      });
+
+      PilhaDeAnaliseSintatica.Push(expressao.LetraGeradora.Nome);
     }
   }
 }

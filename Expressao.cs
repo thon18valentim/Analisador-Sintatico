@@ -60,6 +60,11 @@ namespace AnalisadorSintatico
     public Letra PegarLetraAtual()
       => LetrasGeradas[Ponto.Posicao];
 
+    public static Expressao CopiarExpressao(Expressao expressao)
+    {
+      return new Expressao(Ponto.CriarNovoPonto(expressao.Ponto.Posicao), expressao.LetraGeradora, expressao.LetrasGeradas);
+    }
+
     public override string ToString()
     {
       var letrasGeradas = string.Empty;

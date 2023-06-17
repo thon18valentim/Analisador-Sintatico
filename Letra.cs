@@ -10,6 +10,8 @@ namespace AnalisadorSintatico
     public bool EFinal { get; init; }
     public bool GeraEstadoAceitacao { get; init; }
 
+    private bool lida = false;
+
     public Letra(int id, string nome, bool eFinal, bool geraEstadoAceitacao)
     {
       Id = id;
@@ -31,7 +33,12 @@ namespace AnalisadorSintatico
     }
 
     public List<Expressao> GerarExpressoes()
-    { 
+    {
+      if (lida)
+        return null;
+      else
+        lida = true;
+
       List<Expressao> expressoes = new();
       List<List<Expressao>> subExpressoes = new();
 
@@ -46,7 +53,9 @@ namespace AnalisadorSintatico
             continue;
 
           var lista = Galhos[i].Letras[j].GerarExpressoes();
-          subExpressoes.Add(lista);
+
+          if (lista != null)
+            subExpressoes.Add(lista);
         }
       }
 
@@ -77,7 +86,9 @@ namespace AnalisadorSintatico
             continue;
 
           var lista = Galhos[i].Letras[j].GerarExpressoes();
-          subExpressoes.Add(lista);
+
+          if (lista != null)
+            subExpressoes.Add(lista);
         }
       }
 

@@ -74,7 +74,9 @@ namespace AnalisadorSintatico
 
         var letraRecebida = Expressoes[i].PegarLetraAtual();
         var acao = RegistrarAcao(letraRecebida, item.Index);
-        item = Expressoes[i].LerProximaLetra(item);
+        var expressao = Expressao.CopiarExpressao(Expressoes[i]);
+
+        item = expressao.LerProximaLetra(item);
         
         if (listaAtual.Count > 0)
         {
@@ -122,7 +124,7 @@ namespace AnalisadorSintatico
       foreach (var ex in itemA.Expressoes)
       {
 
-        if (!Equals(ex.ToStringSemPonto(), itemB?.Expressoes?[contador].ToStringSemPonto()))
+        if (!Equals(ex.ToString(), itemB?.Expressoes?[contador].ToString()))
           return false;
 
         contador += 1;
