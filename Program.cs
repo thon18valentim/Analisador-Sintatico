@@ -120,7 +120,7 @@ List<Expressao> expressoesDeReducao = new()
   new(S, new(){ E, m, S }),
 };
 
-var palavra = "ixmxf";
+var palavra = "iiixfmixffmixff";
 Compilador compilador = new(cabecalho, tabelaCanonica, gramaticaConhecida, expressoesDeReducao);
 compilador.SetarPalavra(palavra);
 var resultado = compilador.Executar();
