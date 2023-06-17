@@ -16,6 +16,7 @@ namespace AnalisadorSintatico
     private Stack<string> PilhaDeAnaliseSintatica { get; set; }
     private List<Item> Estados { get; set; }
     private Gramatica GramaticaConhecida { get; set; }
+    private List<Expressao> ExpressoesDeReducao { get; set; }
 
     public Compilador(string[] cabecalhoCanonico, string[,] tabelaCanonica, List<Item> estados, Gramatica gramaticaConhecida)
     {
@@ -23,6 +24,14 @@ namespace AnalisadorSintatico
       SetarTabelaCanonica(tabelaCanonica);
       Estados = estados;
       GramaticaConhecida = gramaticaConhecida;
+    }
+
+    public Compilador(string[] cabecalhoCanonico, string[,] tabelaCanonica, Gramatica gramaticaConhecida, List<Expressao> expressoesDeReducao)
+    {
+      CabecalhoCanonico = cabecalhoCanonico;
+      SetarTabelaCanonica(tabelaCanonica);
+      GramaticaConhecida = gramaticaConhecida;
+      ExpressoesDeReducao = expressoesDeReducao;
     }
 
     private void InicializarPilhaDeAnaliseSintatica()
@@ -113,11 +122,10 @@ namespace AnalisadorSintatico
       // verificando se é redução
       if (acao[0] == 'r')
       {
-        //AplicarReducao(letra.ToString());
-        AplicarReducaoTESTE(int.Parse(acao[1].ToString()));
+        AplicarReducaoTESTEDOIS(int.Parse(acao[1].ToString()));
         acaoNaPilha = 0;
       }
-      else if (acao[0] == 'S')
+      else if (acao[0] == 's')
       {
         PilhaDeAnaliseSintatica.Push(letra.ToString());
         PilhaDeAnaliseSintatica.Push(acao[1].ToString());
@@ -164,35 +172,6 @@ namespace AnalisadorSintatico
       return 'a';
     }
 
-    private void AplicarReducao(string letraReducao)
-    {
-      string letraGeradora = string.Empty;
-      Galho? galhoAchado = null;
-      foreach (var letra in GramaticaConhecida.Letras)
-      {
-        foreach (var galho in letra.Galhos)
-        {
-          if (galho.TemLetra(letraReducao))
-          {
-            letraGeradora = letra.Nome;
-            galhoAchado = galho;
-            break;
-          } 
-        }
-      }
-
-      if (galhoAchado == null)
-        throw new Exception("Erro, nenhum galho foi encontrado ao aplicar Redução.");
-
-      galhoAchado.Letras.ForEach(lt =>
-      {
-        PilhaDeAnaliseSintatica.Pop();
-        PilhaDeAnaliseSintatica.Pop();
-      });
-
-      PilhaDeAnaliseSintatica.Push(letraGeradora);
-    }
-
     private void AplicarReducaoTESTE(int numeroReducao)
     {
       var estado = Estados.FirstOrDefault(es => es.NumeroReducao == numeroReducao);
@@ -201,6 +180,21 @@ namespace AnalisadorSintatico
         throw new Exception($"Erro, não existem nenhum estado com redução r{numeroReducao}");
 
       var expressao = estado?.Expressoes[0];
+      expressao.LetrasGeradas.ForEach(lt =>
+      {
+        PilhaDeAnaliseSintatica.Pop();
+        PilhaDeAnaliseSintatica.Pop();
+      });
+
+      PilhaDeAnaliseSintatica.Push(expressao.LetraGeradora.Nome);
+    }
+
+    private void AplicarReducaoTESTEDOIS(int numeroReducao)
+    {
+      if (numeroReducao > ExpressoesDeReducao.Count)
+        throw new Exception($"Erro, não existem nenhuma redução r{numeroReducao}");
+
+      var expressao = ExpressoesDeReducao[numeroReducao - 1];
       expressao.LetrasGeradas.ForEach(lt =>
       {
         PilhaDeAnaliseSintatica.Pop();

@@ -93,4 +93,39 @@ var pi = new Letra(4, "i", true, false);
 var pf = new Letra(5, "f", true, false);
 var m = new Letra(6, "m", true, false);
 
-Gramatica gramaticaConhecida = new Gramatica(new() { Slinha, S, E, x, pi, pf, m });
+var cabecalho = new string[]
+{
+  "i", "f", "x", "m", "$", "S", "E"
+};
+var tabelaCanonica = new string[,]
+{
+  { "0", "s2", " ",  "s3", " ",  " ",  "1",  " " },
+  { "1", " ",  " ",  " ",  " ",  "X",  " ",  " " },
+  { "2", "s2", " ",  "s3", " ",  " ",  "5",  "4" },
+  { "3", "r2", "r2", "r2", "r2", "r2", "r2", "r2" },
+  { "4", " ",  "s6", " ",  "s7", " ",  " ",  " " },
+  { "5", "r3", "r3", "r3", "r3", "r3", "r3", "r3" },
+  { "6", "r1", "r1", "r1", "r1", "r1", "r1", "r1" },
+  { "7", "s2", " ",  "s3", " ",  " ",  "8",  " " },
+  { "8", "r4", "r4", "r4", "r4", "r4", "r4", "r4" },
+};
+
+Gramatica gramaticaConhecida = new(new() { Slinha, S, E, x, pi, pf, m });
+
+List<Expressao> expressoesDeReducao = new()
+{
+  new(S, new(){ pi, E, pf }),
+  new(S, new(){ x }),
+  new(E, new(){ S }),
+  new(S, new(){ E, m, S }),
+};
+
+var palavra = "ixmxf";
+Compilador compilador = new(cabecalho, tabelaCanonica, gramaticaConhecida, expressoesDeReducao);
+compilador.SetarPalavra(palavra);
+var resultado = compilador.Executar();
+
+if (resultado)
+  Console.WriteLine($"Palavra {palavra} ACEITA!");
+else
+  Console.WriteLine($"Palavra {palavra} RECUSADA!");
