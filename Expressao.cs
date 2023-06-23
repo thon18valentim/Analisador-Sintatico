@@ -49,8 +49,11 @@ namespace AnalisadorSintatico
       return PegarProximaLetra().GerarExpressoes(itemNovo);
     }
 
-    private Letra PegarProximaLetra()
+    public Letra? PegarProximaLetra()
     {
+      if (Ponto.Posicao >= LetrasGeradas.Count)
+        return null;
+
       return LetrasGeradas[Ponto.Posicao];
     }
 

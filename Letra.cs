@@ -47,16 +47,24 @@ namespace AnalisadorSintatico
         Expressao expressao = new(this, Galhos[i].Letras);
         expressoes.Add(expressao);
 
-        for (int j = 0; j < Galhos[i].Letras.Count; j++)
-        {
-          if (Galhos[i].Letras[j].Id == Id)
-            continue;
+        var proximaLetra = expressao.PegarProximaLetra();
+        if (proximaLetra == null)
+          continue;
 
-          var lista = Galhos[i].Letras[j].GerarExpressoes();
+        var lista = proximaLetra.GerarExpressoes();
+        if (lista != null)
+          subExpressoes.Add(lista);
 
-          if (lista != null)
-            subExpressoes.Add(lista);
-        }
+        //for (int j = 0; j < Galhos[i].Letras.Count; j++)
+        //{
+        //  if (Galhos[i].Letras[j].Id == Id)
+        //    continue;
+
+        //  var lista = Galhos[i].Letras[j].GerarExpressoes();
+
+        //  if (lista != null)
+        //    subExpressoes.Add(lista);
+        //}
       }
 
       foreach (var listaDeExpressoes in subExpressoes)
@@ -80,23 +88,32 @@ namespace AnalisadorSintatico
         Expressao expressao = new(this, Galhos[i].Letras);
         expressoes.Add(expressao);
 
-        for (int j = 0; j < Galhos[i].Letras.Count; j++)
-        {
-          if (Galhos[i].Letras[j].Id == Id)
-            continue;
+        var proximaLetra = expressao.PegarProximaLetra();
+        if (proximaLetra == null)
+          continue;
 
-          var lista = Galhos[i].Letras[j].GerarExpressoes();
+        var lista = proximaLetra.GerarExpressoes();
+        if (lista != null)
+          subExpressoes.Add(lista);
 
-          if (lista != null)
-            subExpressoes.Add(lista);
-        }
+        //for (int j = 0; j < Galhos[i].Letras.Count; j++)
+        //{
+        //  if (Galhos[i].Letras[j].Id == Id)
+        //    continue;
+
+        //  var lista = Galhos[i].Letras[j].GerarExpressoes();
+
+        //  if (lista != null)
+        //    subExpressoes.Add(lista);
+        //}
       }
 
       foreach (var listaDeExpressoes in subExpressoes)
       {
         foreach (var expressao in listaDeExpressoes)
         {
-          expressoes.Add(expressao);
+          if (!listaDeExpressoes.Any(ex => ex.ToString() == expressao.ToString()))
+            expressoes.Add(expressao);
         }
       }
 

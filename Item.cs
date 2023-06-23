@@ -133,6 +133,14 @@ namespace AnalisadorSintatico
       return true;
     }
 
+    private void GerarExpressoesLetraADireitaDoPonto()
+    {
+      foreach (var expressao in Expressoes)
+      {
+
+      }
+    }
+
     public Acao RegistrarAcao(Letra letra, int goTo)
     {
       var acao = new Acao(letra.Nome, goTo, letra.EFinal);

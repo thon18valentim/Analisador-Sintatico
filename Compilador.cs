@@ -122,7 +122,7 @@ namespace AnalisadorSintatico
       // verificando se é redução
       if (acao[0] == 'r')
       {
-        AplicarReducaoTESTEDOIS(int.Parse(acao[1].ToString()));
+        AplicarReducao(int.Parse(acao[1].ToString()));
         acaoNaPilha = 0;
       }
       else if (acao[0] == 's')
@@ -172,24 +172,7 @@ namespace AnalisadorSintatico
       return 'a';
     }
 
-    private void AplicarReducaoTESTE(int numeroReducao)
-    {
-      var estado = Estados.FirstOrDefault(es => es.NumeroReducao == numeroReducao);
-
-      if (estado == null)
-        throw new Exception($"Erro, não existem nenhum estado com redução r{numeroReducao}");
-
-      var expressao = estado?.Expressoes[0];
-      expressao.LetrasGeradas.ForEach(lt =>
-      {
-        PilhaDeAnaliseSintatica.Pop();
-        PilhaDeAnaliseSintatica.Pop();
-      });
-
-      PilhaDeAnaliseSintatica.Push(expressao.LetraGeradora.Nome);
-    }
-
-    private void AplicarReducaoTESTEDOIS(int numeroReducao)
+    private void AplicarReducao(int numeroReducao)
     {
       if (numeroReducao > ExpressoesDeReducao.Count)
         throw new Exception($"Erro, não existem nenhuma redução r{numeroReducao}");

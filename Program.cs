@@ -3,23 +3,13 @@ using AnalisadorSintatico;
 
 #region
 /*
-//var slinha = new Letra(1, "S'", false, true);
-//var s = new Letra(2, "S", false, false);
-//var a = new Letra(3, "A", false, false);
-//var azinho = new Letra(5, "a", true, false);
-//var bzinho = new Letra(6, "b", true, false);
-
-//slinha.CriarGalhos(new() { new Galho(new() { s }, 0) });
-//s.CriarGalhos(new() { new Galho(new() { a, a }, 1) });
-//a.CriarGalhos(new() { new Galho(new() { azinho, a }, 2), new Galho(new() { bzinho }, 3) });
-
 var Slinha = new Letra(0, "S'", false, true);
 var S = new Letra(1, "S", false, false);
 var E = new Letra(2, "E", false, false);
 var x = new Letra(3, "x", true, false);
-var pi = new Letra(4, "i", true, false);
-var pf = new Letra(5, "f", true, false);
-var m = new Letra(6, "m", true, false);
+var pi = new Letra(4, "(", true, false);
+var pf = new Letra(5, ")", true, false);
+var m = new Letra(6, "+", true, false);
 
 Slinha.CriarGalhos(new() { new Galho(new() { S }, 0) });
 S.CriarGalhos(new() { new Galho(new() { pi, E, pf }, 1), new Galho(new() { x }, 2) });
@@ -73,7 +63,7 @@ Console.WriteLine(gramatica);
 var tabelaCanonica = new TabelaCanonica(acoes, goTo);
 tabelaCanonica.CriarTabela(listaDeItems, gramatica);
 
-var palavra = "xmx";
+var palavra = "((x)+(x))";
 Compilador compilador = new(tabelaCanonica.PegarCabecalho(), tabelaCanonica.PegarTabela(), listaDeItems, gramatica);
 compilador.SetarPalavra(palavra);
 var resultado = compilador.Executar();
@@ -89,13 +79,13 @@ var Slinha = new Letra(0, "S'", false, true);
 var S = new Letra(1, "S", false, false);
 var E = new Letra(2, "E", false, false);
 var x = new Letra(3, "x", true, false);
-var pi = new Letra(4, "i", true, false);
-var pf = new Letra(5, "f", true, false);
-var m = new Letra(6, "m", true, false);
+var pi = new Letra(4, "(", true, false);
+var pf = new Letra(5, ")", true, false);
+var m = new Letra(6, "+", true, false);
 
 var cabecalho = new string[]
 {
-  "i", "f", "x", "m", "$", "S", "E"
+  "(", ")", "x", "+", "$", "S", "E"
 };
 var tabelaCanonica = new string[,]
 {
@@ -120,7 +110,7 @@ List<Expressao> expressoesDeReducao = new()
   new(S, new(){ E, m, S }),
 };
 
-var palavra = "iiixfmixffmixff";
+var palavra = "((x)+(x))";
 Compilador compilador = new(cabecalho, tabelaCanonica, gramaticaConhecida, expressoesDeReducao);
 compilador.SetarPalavra(palavra);
 var resultado = compilador.Executar();
